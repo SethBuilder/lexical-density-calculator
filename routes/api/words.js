@@ -1,38 +1,52 @@
 const express = require('express');
 const router = express.Router();
-
-// Word Model
+const {getLD} = require('../../util/getLD');
 const NonLexWord = require('../../models/Word');
 
 // @route	GET api/words
-// @desc	Get Lexical Density of a sentence
+// @desc	Get Lexical Density of text
 // @access	Public
 router.get('/', async (req, res)	=>	{
 
-	const sentenceWithPunctuations = req.body.sentence.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-	const sentence = sentenceWithPunctuations.replace(/\s{2,}/g," ").toLowerCase();
-	const words = sentence.split(" ");
+	const sentenceWithPunctuations = req.body.sentence.replace(/[,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+	const sentences = sentenceWithPunctuations.replace(/\s{2,}/g," ").toLowerCase().split(".");
+	let nonLexicalWords = await NonLexWord.find({});
+	var lexicalDensities = [];
 
-	const totalNumberOfWords = words.length;
-	let totalNumberOfLexicalWords = 0;
-	let nonLexicalWords = [];
-
-	nonLexicalWords = await NonLexWord.find({});
-
-	words.forEach(word => {
-		const found = nonLexicalWords.find(element => element.name === word);
-		if(!found) {
-			totalNumberOfLexicalWords++;
-		}
+	// sentences.forEach(sentence => getLD(sentence, (ld) => lexicalDensities.push(ld)));
+	for await (sentence of sentences) {
+		 const ld = getLD(sentence,nonLexicalWords);
+		 lexicalDensities.push(ld);
+	}
+	console.log(lexicalDensities);
+	// Calculate overall LD
+	const numberOfSentences = sentences.length;
+	let sumOfLDs = 0;
+	
+	lexicalDensities.forEach(ld => {
+		sumOfLDs += ld;
 	});
-	const ld = (totalNumberOfLexicalWords / totalNumberOfWords * 100).toFixed(2);
-	res.json(
-		{
+
+	const overallLD = parseFloat((sumOfLDs / numberOfSentences).toFixed(2));
+	const verbose = req.query.mode === "verbose";
+
+	if(verbose) {
+		res.json({
 			data: {
-				overall_ld: ld
+				sentence_ld: lexicalDensities,
+				overall_ld: overallLD
 			}
-		}
-	);
+		})
+	} else {
+		res.json(
+			{
+				data: {
+					overall_ld: overallLD
+				}
+			}
+		);
+	}
+
 });
 
 module.exports = router;
