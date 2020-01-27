@@ -2,11 +2,11 @@
   "name": "vai",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "watch": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "watch": "nodemon server.js",
+    "test": "jest --watchAll --verbose --runInBand"
   },
   "author": "Seif Elmughrabi",
   "license": "MIT",
@@ -17,6 +17,11 @@
     "mongoose": "^5.8.9"
   },
   "devDependencies": {
-    "nodemon": "^2.0.2"
+    "jest": "^25.1.0",
+    "nodemon": "^2.0.2",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }

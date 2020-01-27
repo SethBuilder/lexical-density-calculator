@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getLD } = require('../../util/getLD');
+const { getLD, wordCounter, sentencesWithoutPunctuations } = require('../../util');
 const NonLexWord = require('../../models/Word');
 const { check, validationResult } = require('express-validator');
 
@@ -16,7 +16,9 @@ router.get('/', [
 			if (wordCounter(text) > 100) {
 				return Promise.reject('Text is too long; must be less than 100 words')
 			}
+			return true;
 		})
+		.withMessage('Text is too long; must be less than 100 words')
 ], async (req, res) => {
 
 	const errors = validationResult(req);
@@ -33,7 +35,7 @@ router.get('/', [
 		const ld = getLD(sentence, nonLexicalWords);
 		lexicalDensities.push(ld);
 	}
-	console.log(lexicalDensities);
+	// console.log(lexicalDensities);
 
 	// Calculate overall LD
 	const numberOfSentences = sentences.length;
@@ -64,13 +66,5 @@ router.get('/', [
 	}
 
 });
-
-function sentencesWithoutPunctuations(sentences) {
-	return sentences.replace(/[,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
-}
-
-function wordCounter(sentences) {
-	return sentences.split(' ').length;
-}
 
 module.exports = router;
