@@ -15,6 +15,6 @@ mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
 	.catch(err	=>	console.log(err))
 
 // Use Routes
-app.use('/api/words', words);
+app.use('/complexity', words);
 
 module.exports = app
