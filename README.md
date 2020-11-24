@@ -16,8 +16,5 @@ If the provided text ends with a full stop, it's considered an extra sentence wi
 # Tests
 `npm run test`
 
-# Demo
-A link to a shared Postman collection has been sent by email
-
 # Contact
 Forward your questions to: seif@seif.rocks.
